@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Salary Calculator</title>
+	<style>	
+		.field{
+			margin-bottom: 10px;
+		}
+		label{
+			display: block;
+		}
+		#divResult{
+			color : red;
+			font-size: 20pt;
+			font-weight: bold;
+		}
+		body{
+			margin-left: 100px;
+		}
+	</style>
+	<script src="jquery-1.12.4.min.js"></script>
+	<script src="angular.js"></script>
+	<script>
+		//React to user actions
+		function compile(root){
+			function bindTwoWay(control, model, scope){
+				$(control).change(function(){
+					scope.$apply(function(){
+						var expr = model + '=' + $(control).val().toInt();
+						scope.$eval(expr);
+					});
+				});
+				scope.$watch(model, function(newValue, oldValue){
+					$(control).val(newValue);
+				});
+			}
+			function bindOneWay(control, model, scope){
+				scope.$watch(model, function(newValue, oldValue){
+					$(control).html(newValue);
+				});
+			}
+			function bindClick(control, expr, scope){
+				$(control).click(function(){
+					scope.$apply(function(){
+						scope.$eval(expr);
+					});
+				});
+			}
+			return function(scope){
+				$("*[app-model]").each(function(index, control){
+					var model = $(control).attr("app-model");
+					bindTwoWay(control, model, scope);
+				});
+				$("*[app-click]").each(function(index, control){
+					var expr = $(control).attr("app-click");
+					bindClick(control, expr, scope);
+				})
+				$("*[app-bind]").each(function(index, control){
+					var model = $(control).attr("app-bind");
+					bindOneWay(control, model, scope);
+				});
+			}
+		}
+			
+		
+	</script>
+	<script>
+		Object.prototype.toInt = function(){
+			return parseInt(this, 10);
+		};
+
+		//Model
+		function SalaryCalculator(){
+			this.basic = 0;
+			this.hra = 0;
+			this.da = 0;
+			this.tax = 0;
+			this.salary = 0;
+		}
+
+		SalaryCalculator.prototype.calculate = function(){
+			var gross = this.basic + this.hra + this.da;
+			var net = gross * ((100-this.tax)/100);
+			this.salary = net;
+		}
+
+		//View
+		$(document).ready(function(){
+			angular.injector(["ng"]).invoke(function($rootScope){
+				window.scope = $rootScope;
+				scope.calculator = window.calculator = new SalaryCalculator();
+				compile(document.body)(scope);
+			});
+		});
+	</script>
+</head>
+<body>
+	<h1>Salary Calculator</h1>
+	<hr>
+	<div class="content">
+		<div class="field">
+			<label for="">Basic :</label>
+			<input type="text" id="txtBasic" app-model="calculator.basic">
+		</div>
+		<div class="field">
+			<label for="">HRA :</label>
+			<input type="text" id="txtHra" app-model="calculator.hra">
+		</div>
+		<div class="field">
+			<label for="">DA :</label>
+			<input type="text" id="txtDa" app-model="calculator.da">
+		</div>
+		<div class="field">
+			<label for="">Tax :</label>
+			<input type="range" id="rangeTax" min="0" max="30" app-model="calculator.tax">
+			<span id="spanTax" app-bind="calculator.tax">[Tax]</span>
+		</div>
+		<div class="field">
+			<input type="button" value="Calculate" id="btnCalculate" app-click="calculator.calculate()">
+		</div>
+		<div class="field">
+			<div id="divResult" app-bind="calculator.salary">[Salary]</div>
+		</div>
+	</div>
+</body>
+</html>
