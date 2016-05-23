@@ -23,10 +23,7 @@
 	<script src="angular.js"></script>
 	
 	<script>
-		Object.prototype.toInt = function(){
-			return parseInt(this, 10);
-		};
-
+		
 		//Model
 		function SalaryCalculator(){
 			this.basic = 0;
@@ -44,13 +41,15 @@
 
 		//View
 		angular
-			.module("ng")
+			.module("myApp", [])
 			.run(function($rootScope){
-				$rootScope.calculator = new SalaryCalculator();
+				window.rootScope = $rootScope;
+				//console.log(arguments);
+				//$rootScope.calculator = new SalaryCalculator();
 			});
 	</script>
 </head>
-<body ng-app>
+<body ng-app="myApp">
 	<h1>Salary Calculator</h1>
 	<hr>
 	<div class="content">
@@ -75,7 +74,7 @@
 			<input type="button" value="Calculate" id="btnCalculate" ng-click="calculator.calculate()">
 		</div>
 		<div class="field">
-			<div id="divResult" ng-bind="calculator.salary">[Salary]</div>
+			<div id="divResult" ng-bind="calculator.salary | currency:'Rs'">[Salary]</div>
 		</div>
 	</div>
 </body>
