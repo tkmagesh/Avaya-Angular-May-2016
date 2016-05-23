@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Salary Calculator</title>
+	<style>	
+		.field{
+			margin-bottom: 10px;
+		}
+		label{
+			display: block;
+		}
+		#divResult{
+			color : red;
+			font-size: 20pt;
+			font-weight: bold;
+		}
+		body{
+			margin-left: 100px;
+		}
+	</style>
+	<script src="jquery-1.12.4.min.js"></script>
+	<script src="angular.js"></script>
+	<script>
+		Object.prototype.toInt = function(){
+			return parseInt(this, 10);
+		};
+
+		//Model
+		function SalaryCalculator(){
+			this.basic = 0;
+			this.hra = 0;
+			this.da = 0;
+			this.tax = 0;
+			this.salary = 0;
+		}
+
+		SalaryCalculator.prototype.calculate = function(){
+			var gross = this.basic + this.hra + this.da;
+			var net = gross * ((100-this.tax)/100);
+			this.salary = net;
+		}
+
+		//View
+		$(document).ready(function(){
+			
+			angular.injector(["ng"]).invoke(function($rootScope){
+				window.scope = $rootScope;
+				scope.calculator = window.calculator = new SalaryCalculator();
+			})
+
+			//React to user actions
+			$("#txtBasic").change(function(){
+				scope.$apply(function(){
+					calculator.basic = $("#txtBasic").val().toInt();
+				});
+			});
+			$("#txtHra").change(function(){
+				scope.$apply(function(){
+					calculator.hra = $("#txtHra").val().toInt();
+				});
+			});
+			$("#txtDa").change(function(){
+				scope.$apply(function(){
+					calculator.da = $("#txtDa").val().toInt();
+				});
+			});
+			$("#rangeTax").change(function(){
+				scope.$apply(function(){
+					calculator.tax = $("#rangeTax").val().toInt();
+				});
+			});
+			$("#btnCalculate").click(function(){
+				scope.$apply(function(){
+					calculator.calculate();
+				});
+			});
+
+			//React to model changes
+			scope.$watch('calculator.basic', function(newValue, oldValue){
+				$("#txtBasic").val(newValue);
+			});
+			scope.$watch('calculator.hra', function(newValue, oldValue){
+				$("#txtHra").val(newValue);
+			});
+			scope.$watch('calculator.da', function(newValue, oldValue){
+				$("#txtDa").val(newValue);
+			});
+			scope.$watch('calculator.tax', function(newValue, oldValue){
+				$("#rangeTax").val(newValue);
+			});
+			scope.$watch('calculator.tax', function(newValue, oldValue){
+				$("#spanTax").html(newValue);
+			});
+			scope.$watch('calculator.salary', function(newValue, oldValue){
+				$("#divResult").html(newValue);
+			});
+
+		});
+	</script>
+</head>
+<body>
+	<h1>Salary Calculator</h1>
+	<hr>
+	<div class="content">
+		<div class="field">
+			<label for="">Basic :</label>
+			<input type="text" name="" id="txtBasic">
+		</div>
+		<div class="field">
+			<label for="">HRA :</label>
+			<input type="text" name="" id="txtHra">
+		</div>
+		<div class="field">
+			<label for="">DA :</label>
+			<input type="text" name="" id="txtDa">
+		</div>
+		<div class="field">
+			<label for="">Tax :</label>
+			<input type="range" name="" id="rangeTax" min="0" max="30" value="0">
+			<span id="spanTax">[Tax]</span>
+		</div>
+		<div class="field">
+			<input type="button" value="Calculate" id="btnCalculate">
+		</div>
+		<div class="field">
+			<div id="divResult">[Salary]</div>
+		</div>
+	</div>
+</body>
+</html>
