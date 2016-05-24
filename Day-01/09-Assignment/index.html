@@ -13,18 +13,55 @@
 			margin-left: 100px;
 		}
 	</style>
+	<script src="angular.js"></script>
+	<script>
+		function MathCalculator(){
+			this.number1 = 0;
+			this.number2 = 0;
+			this.result = 0;
+		}
+		MathCalculator.prototype.add = function(){
+			this.result = this.number1 + this.number2;
+		};
+		MathCalculator.prototype.subtract = function(){
+			this.result = this.number1 -this.number2;
+		};
+		MathCalculator.prototype.multiply = function(){
+			this.result = this.number1 * this.number2;
+		};
+		MathCalculator.prototype.divide = function(){
+			this.result = this.number1 / this.number2;
+		};
+		var myApp = angular.module("myApp", []);
+		myApp.controller("mathController", function($scope){
+			$scope.calculator = new MathCalculator();
+		});
+	</script>
 </head>
-<body>
+<body ng-app="myApp">
 	<h1>Math Calculator</h1>
 	<hr>
-	<div class="content">
-		<input type="text" name="" id="">
-		<input type="text" name="" id="">
+	<div class="content" ng-controller="mathController">
+		<input type="number" ng-model="calculator.number1">
+		<input type="number" ng-model="calculator.number2">
 		<br>
-		<input type="button" value="Add">
-		<input type="button" value="Subtract">
-		<input type="button" value="Multiply">
-		<input type="button" value="Divide">
+		<input type="button" value="Add" ng-click="calculator.add()">
+		<input type="button" value="Subtract" ng-click="calculator.subtract()">
+		<input type="button" value="Multiply" ng-click="calculator.multiply()">
+		<input type="button" value="Divide" ng-click="calculator.divide()">
+		<div id="divResult" ng-bind="calculator.result">[Result]</div>
+	</div>
+	<hr>
+	<div class="content">
+		<input type="number">
+		<select>
+			<option value="add">Add</option>
+			<option value="subtract">Subtract</option>
+			<option value="multiply">Multiply</option>
+			<option value="divide">Divide</option>
+		</select>
+		<input type="number">
+		<input type="button" value="Calculate">
 		<div id="divResult">[Result]</div>
 	</div>
 </body>
