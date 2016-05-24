@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Bug Tracker</title>
+	<style>
+		.stats, .bugname{
+			font-size: 20pt;	
+		}
+		.bugname{
+			cursor : pointer;
+		}
+		.closed{
+			color : red;
+			text-decoration: line-through;
+			font-weight: bold;
+			font-style: italic;
+		}
+		section{
+			margin-bottom: 10px
+		}
+		ol{
+			width: 500px;
+			list-style: none;
+		}
+		li{
+			margin-bottom: 10px;
+			padding : 5px;
+			border : 1px solid gray;
+			background-color: #e7e7e7;
+			border-radius: 5px;
+		}
+		body{
+			margin-left: 100px;
+		}
+	</style>
+	<script type="text/javascript">
+	/*
+		1. Add a new bug
+		2. List of bugs
+		3. Toggle the 'closed' status of a bug
+		4. Remove 'closed' bugs
+		5. Display statistics
+		6. Search for bugs
+		7. Sort the bugs
+		8. Improve the bug display
+		9. Persist the bugs in the localStorage
+		10. Display 'createdAt' for each bug
+		11. Persist the bugs in the server
+		12. Make the bugs accessible using a url
+	*/
+	</script>
+</head>
+<body>
+	<h1>Bug Tracker</h1>
+	<hr>
+	<div class="content">
+		<section class="stats">
+			<span class="closed">2</span>
+			<span> / </span>
+			<span>8</span>
+		</section>
+		<section class="search">
+			<label for="">Search :</label>
+			<input type="text">
+			<label for="">Is Closed ? :</label>
+			<input type="checkbox">
+			<input type="button" value="Show All">
+		</section>
+		<section class="sort">
+			<label for="">Order By :</label>
+			<input type="text">
+			<label for="">Descending ? :</label>
+			<input type="checkbox">
+		</section>
+		<div class="section edit">
+			<label for="">Bug :</label>
+			<input type="text">
+			<input type="button" value="Add New">
+		</div>
+		<section class="list">
+			<ol>
+				<li><span class="bugname">Bug - 1</span></li>
+				<li><span class="bugname closed">Bug - 2</span></li>
+			</ol>
+			<input type="button" value="Remove Closed">
+		</section>
+	</div>
+</body>
+</html>
