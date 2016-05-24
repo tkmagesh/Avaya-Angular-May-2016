@@ -113,6 +113,12 @@
 				$scope.newBugName = '';
 			};
 		});
+
+		bugTrackerApp.filter("trimText", function(){
+			return function(text){
+				return text.length < 30 ? text : text.substr(0,30) + '...';
+			};
+		});
 	</script>
 </head>
 <bod ng-app="bugTrackerApp">
@@ -150,7 +156,7 @@
 			<ol>
 				<li ng-repeat="bug in (bugs.list | filter:searchBug | orderBy:bugSortBy:bugSortOrder) ">
 					<span class="bugname" ng-click="bugs.toggleBug(bug)" ng-class="{closed : bug.isClosed}">
-						{{bug.name}} <small><i><sup>[{{bug.id}}]</sup></i></small>
+						{{bug.name | trimText}} <small><i><sup>[{{bug.id}}]</sup></i></small>
 					</span>
 				</li>
 			</ol>
