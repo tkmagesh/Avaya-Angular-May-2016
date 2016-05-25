@@ -1,0 +1,10 @@
+<h3>{{bug.name}}</h3>
+<label for="">Status : </label>
+<span ng-style="{color : bug.isClosed ? 'green' : 'red'}">
+	{{bug.isClosed ? 'Closed' : 'Open'}}
+</span>
+<p>{{bug.desc}}</p>
+<hr>
+<label for="">Created @</label><i><strong>{{bug | elapsed}}</strong></i>
+<br>
+<a href="#/bugs/list">Show All</a>

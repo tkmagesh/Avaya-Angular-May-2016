@@ -1,0 +1,5 @@
+<span class="bugname" ng-click="toggleBug(data)" ng-class="{closed : data.isClosed}">
+	{{data.name | trimText:20}} 
+</span>
+<small><i><sup>[{{data.id}}]</sup></i></small>
+<a href="#/bugs/details/{{data.id}}">Details</a>

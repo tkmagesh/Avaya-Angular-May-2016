@@ -1,0 +1,30 @@
+	<a href="#/bugs/new">Create New</a>
+	<section class="stats">
+		<span class="closed">{{ bugs | toClosedCount }}</span>
+		<span> / </span>
+		<span>{{bugs.length}}</span>
+	</section>
+	<section class="search">
+		<label for="">Search :</label>
+		<input type="text" ng-model="searchBug.name">
+		<label for="">Is Closed ? :</label>
+		<input type="checkbox" ng-model="searchBug.isClosed">
+		<input type="button" value="Show All" ng-click="searchBug.isClosed=''">
+	</section>
+	<section class="sort">
+		<label for="">Order By :</label>
+		<select ng-model="bugSortBy">
+			<option value="name">Name</option>
+			<option value="isClosed">Status</option>
+		</select>
+		<label for="">Descending ? :</label>
+		<input type="checkbox" ng-model="bugSortOrder">
+	</section>
+	<section class="list">
+		<ol>
+			<li ng-repeat="bug in (bugs | filter:searchBug | orderBy:bugSortBy:bugSortOrder) ">
+				<bug-item data="bug"></bug-item>
+			</li>
+		</ol>
+		<input type="button" value="Remove Closed" ng-click="removeClosed()">
+	</section>
