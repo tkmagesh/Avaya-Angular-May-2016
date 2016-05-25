@@ -73,11 +73,31 @@
 	*/
 	</script>
 	<script src="angular.js"></script>
+	<script src="angular-route.js"></script>
 	<script src="moment.js"></script>
 	<script src="utils.js"></script>
 	<script>
 
-		var bugTrackerApp = angular.module("bugTrackerApp", ["utils"]);
+		var bugTrackerApp = angular.module("bugTrackerApp", ["ngRoute", "utils"]);
+
+		bugTrackerApp.config(function($routeProvider){
+			$routeProvider
+				.when("/bugs/list", {
+					templateUrl : 'templates/list.html',
+					controller : 'bugsController'
+				})
+				.when("/bugs/new", {
+					templateUrl : 'templates/new.html',
+					controller : 'bugsNewController'
+				})
+				.when("/bugs/details/:id", {
+					templateUrl : 'templates/details.html',
+					controller : 'bugsDetailsController'
+				})
+				.otherwise({
+					redirectTo : '/bugs/list'
+				});
+		});
 
 		bugTrackerApp.value('appDefaults',{
 			bugName : 'Something went wrong - [default]',
@@ -100,20 +120,6 @@
 
 		bugTrackerApp.service("bugService", function($http, $q, $rootScope){
 			this.getAll = function(){
-				/*var deferred = $q.defer();
-
-				var httpPromise = $http.get("http://localhost:3000/bugs");
-				httpPromise.then(function(response){
-					deferred.resolve(response.data);
-				});
-				return deferred.promise;*/
-
-				/*var httpPromise = $http.get("http://localhost:3000/bugs");
-				var resultPromise = httpPromise.then(function(response){
-					return response.data;
-				});
-				return resultPromise;*/
-
 				return $http
 					.get("http://localhost:3000/bugs")
 					.then(function(response){
@@ -150,7 +156,7 @@
 			};
 		});
 		
-		bugTrackerApp.controller("bugsController", function($scope, bugOperations, $http, bugService){
+		bugTrackerApp.controller("bugsController", function($scope, bugOperations, bugService){
 			$scope.bugs = [];
 			
 			var promise = bugService.getAll();
@@ -183,6 +189,28 @@
 			}
 
 		});
+		bugTrackerApp.controller("bugsNewController", function($scope, bugOperations, bugService, $location){
+
+			$scope.addNew = function(bugName){
+				var newBug = bugOperations.create(0, bugName);
+				bugService
+					.addNew(newBug)
+					.then(function(bug){
+						$location.path('/bugs/list');
+					})
+					.catch(function(err){
+						console.log(err);
+					});
+			};
+		});
+		bugTrackerApp.controller("bugsDetailsController", function($scope, bugService, $routeParams){
+			var bugId = $routeParams.id;
+			bugService
+				.get(bugId)
+				.then(function(bug){
+					$scope.bug = bug;
+				});
+		});
 		bugTrackerApp.filter("toClosedCount", function(){
 			return function(bugs){
 				bugs = bugs || [];
@@ -198,47 +226,7 @@
 <bod ng-app="bugTrackerApp">
 	<h1>Bug Tracker</h1>
 	<hr>
-	<div class="content" ng-controller="bugsController">
-		<section class="stats">
-			<!-- <span class="closed">{{ (bugs | filter:{isClosed:true}).length }}</span> -->
-			<span class="closed">{{ bugs | toClosedCount }}</span>
-			<span> / </span>
-			<span>{{bugs.length}}</span>
-		</section>
-		<section class="search">
-			<label for="">Search :</label>
-			<input type="text" ng-model="searchBug.name">
-			<label for="">Is Closed ? :</label>
-			<input type="checkbox" ng-model="searchBug.isClosed">
-			<input type="button" value="Show All" ng-click="searchBug.isClosed=''">
-		</section>
-		<section class="sort">
-			<label for="">Order By :</label>
-			<!-- <input type="text" ng-model="bugSortBy"> -->
-			<select ng-model="bugSortBy">
-				<option value="name">Name</option>
-				<option value="isClosed">Status</option>
-			</select>
-			<label for="">Descending ? :</label>
-			<input type="checkbox" ng-model="bugSortOrder">
-		</section>
-		<div class="section edit">
-			<label for="">Bug :</label>
-			<input type="text" ng-model="newBugName">
-			<input type="button" value="Add New" ng-click="addNew(newBugName)">
-		</div>
-		<section class="list">
-			<ol>
-				<li ng-repeat="bug in (bugs | filter:searchBug | orderBy:bugSortBy:bugSortOrder) ">
-					<span class="bugname" ng-click="toggleBug(bug)" ng-class="{closed : bug.isClosed}">
-						{{bug.name | trimText:20}} 
-					</span>
-					<small><i><sup>[{{bug.id}}]</sup></i></small>
-					<div class="datetime">{{bug.createdAt | elapsed}}</div>
-				</li>
-			</ol>
-			<input type="button" value="Remove Closed" ng-click="removeClosed()">
-		</section>
+	<div class="content" ng-view>
 	</div>
 </body>
 </html>
