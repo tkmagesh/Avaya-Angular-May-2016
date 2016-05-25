@@ -73,8 +73,11 @@
 	*/
 	</script>
 	<script src="angular.js"></script>
+	<script src="moment.js"></script>
+	<script src="utils.js"></script>
 	<script>
-		var bugTrackerApp = angular.module("bugTrackerApp", []);
+
+		var bugTrackerApp = angular.module("bugTrackerApp", ["utils"]);
 
 		bugTrackerApp.value('appDefaults',{
 			bugName : 'Something went wrong - [default]',
@@ -163,12 +166,7 @@
 			};
 		});
 
-		bugTrackerApp.filter("trimText", function(appDefaults){
-			return function(text, trimLength){
-				trimLength = trimLength || appDefaults.trimLength;
-				return text.length < trimLength ? text : text.substr(0,trimLength) + '...';
-			};
-		});
+
 
 		/*bugTrackerApp.filter('toClosedCount', function(){
 			return function(bugs){
@@ -193,6 +191,7 @@
 				},0);
 			};
 		});
+		
 	</script>
 </head>
 <bod ng-app="bugTrackerApp">
@@ -231,9 +230,10 @@
 			<ol>
 				<li ng-repeat="bug in (bugs.list | filter:searchBug | orderBy:bugSortBy:bugSortOrder) ">
 					<span class="bugname" ng-click="bugs.toggleBug(bug)" ng-class="{closed : bug.isClosed}">
-						{{bug.name | trimText:20}} <small><i><sup>[{{bug.id}}]</sup></i></small>
+						{{bug.name | trimText:20}} 
 					</span>
-					<div class="datetime">{{bug.createdAt}}</div>
+					<small><i><sup>[{{bug.id}}]</sup></i></small>
+					<div class="datetime">{{bug.createdAt | elapsed}}</div>
 				</li>
 			</ol>
 			<input type="button" value="Remove Closed" ng-click="bugs.removeClosed()">
