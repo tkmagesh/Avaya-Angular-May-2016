@@ -44,7 +44,7 @@
 		6. Search for bugs - done
 		7. Sort the bugs - done
 		8. Improve the bug display - done
-		9. Persist the bugs in the localStorage
+		9. Persist the bugs in the localStorage - done
 			window.localStorage
 			===================
 			* key/value store
@@ -78,15 +78,13 @@
 		});
 
 		bugTrackerApp.factory('bugOperations', function(appDefaults){
-			var currId = 0;
 			return {
 				toggle : function(bug){
 					return bug.isClosed = !bug.isClosed;
 				},
-				create : function(bugName){
-
+				create : function(id, bugName){
 					return {
-						id : ++currId,
+						id : id,
 						name: bugName || appDefaults.bugName,
 						isClosed : false
 					};
@@ -94,26 +92,62 @@
 			}
 		});
 
-		bugTrackerApp.factory("bugsCollection", function(bugOperations){
-			var bugs = [
-				bugOperations.create('Object reference not found'),
-				bugOperations.create('Server communication failure'),
-				bugOperations.create('User authentication is not as per requirements'),
-				bugOperations.create('Application is not responsive'),
-			];
+		bugTrackerApp.factory("bugStorage", function(bugOperations){
+			var maxBugId = 0;
+			var storage = window.localStorage;
+
+			function getAllBugs(){
+				var result = [];
+				for(var i=0; i<storage.length; i++){
+					var key = storage.key(i);
+					var data = storage.getItem(key);
+					var bug = angular.fromJson(data);
+					maxBugId = maxBugId > bug.id ? maxBugId : bug.id;
+					result.push(bug);
+				}
+				return result;
+			}
+			function addNewBug(bugName){
+				++maxBugId;
+				var newBug = bugOperations.create(maxBugId, bugName);
+				saveBug(newBug);
+				return newBug;
+			}
+			function toggleBug(bug){
+				bugOperations.toggle(bug);
+				saveBug(bug);
+			}
+			function saveBug(bug){
+				storage.setItem(bug.id, angular.toJson(bug));
+			}
+			function removeBug(bug){
+				storage.removeItem(bug.id);
+			}
+			return {
+				getAll : getAllBugs,
+				addNew : addNewBug,
+				toggle : toggleBug,
+				remove : removeBug
+			};
+		});
+
+		bugTrackerApp.factory("bugsCollection", function(bugStorage){
+			var bugs = bugStorage.getAll();
 			return {
 				list : bugs,
 				addNewBug : function(bugName){
-					var newBug = bugOperations.create(bugName);
+					var newBug = bugStorage.addNew(bugName);
 					bugs.push(newBug);
 				},
 				toggleBug :function(bug){
-					bugOperations.toggle(bug);
+					bugStorage.toggle(bug);
 				},
 				removeClosed : function(){
 					for(var i=bugs.length-1; i>=0; i--)
-						if (bugs[i].isClosed)
+						if (bugs[i].isClosed){
+							bugStorage.remove(bugs[i]);
 							bugs.splice(i,1);
+						}
 				}
 			};
 		})
@@ -149,10 +183,8 @@
 			};
 		});*/
 		bugTrackerApp.filter("toClosedCount", function(){
-			
 			return function(bugs){
 				return bugs.reduce(function(result, bug){
-					console.log('result = ', result, ' bug = ', bug);
 					return bug.isClosed ? ++result : result;
 
 				},0);
