@@ -33,6 +33,10 @@
 		body{
 			margin-left: 100px;
 		}
+		.datetime{
+			font-size: small;
+			font-style: italic;
+		}
 	</style>
 	<script type="text/javascript">
 	/*
@@ -77,19 +81,18 @@
 			trimLength : 30
 		});
 
-		bugTrackerApp.factory('bugOperations', function(appDefaults){
-			return {
-				toggle : function(bug){
-					return bug.isClosed = !bug.isClosed;
-				},
-				create : function(id, bugName){
-					return {
-						id : id,
-						name: bugName || appDefaults.bugName,
-						isClosed : false
-					};
-				}
-			}
+		bugTrackerApp.service('bugOperations', function(appDefaults){
+			this.toggle = function(bug){
+				return bug.isClosed = !bug.isClosed;
+			};
+			this.create = function(id, bugName){
+				return {
+					id : id,
+					name: bugName || appDefaults.bugName,
+					isClosed : false,
+					createdAt : new Date()
+				};
+			};
 		});
 
 		bugTrackerApp.factory("bugStorage", function(bugOperations){
@@ -230,6 +233,7 @@
 					<span class="bugname" ng-click="bugs.toggleBug(bug)" ng-class="{closed : bug.isClosed}">
 						{{bug.name | trimText:20}} <small><i><sup>[{{bug.id}}]</sup></i></small>
 					</span>
+					<div class="datetime">{{bug.createdAt}}</div>
 				</li>
 			</ol>
 			<input type="button" value="Remove Closed" ng-click="bugs.removeClosed()">
